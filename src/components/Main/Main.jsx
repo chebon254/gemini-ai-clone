@@ -7,7 +7,7 @@ function Main() {
     <div className='main'>
       <div className="nav">
         <p>Gemini</p>
-        <img src={assets.user_icon} alt="Gemini AI Clone" />
+        <img src={assets.user_profile_icon} alt="Gemini AI Clone" />
       </div>
       <div className="main-container">
         <div className="greet">
