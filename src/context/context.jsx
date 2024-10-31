@@ -12,29 +12,49 @@ const ContextProvider = (props) => {
   const [resultData, setResultData] = useState("");
 
   const delayPara = (index, nextWord) => {
-     setTimeout(function () {
-        setResultData(prev=>prev+nextWord)
-     }, 75*index)
-  }
+    setTimeout(function () {
+      setResultData((prev) => prev + nextWord);
+    }, 75 * index);
+  };
 
-  const newChat = () =>{
-    setLoading(false)
-    setShowResult(false)
-  }
+  const newChat = () => {
+    setLoading(false);
+    setShowResult(false);
+  };
 
   const onSent = async (prompt) => {
-    setResultData("")
-    setLoading(true)
-    setShowResult(true)
+    setResultData("");
+    setLoading(true);
+    setShowResult(true);
     let response;
+
     if (prompt !== undefined) {
+      // When prompt is provided
       response = await run(prompt);
-      setRecentPrompt(prompt)
-    } else{
-      setPrevPrompts(prev=>[...prev, input])
-      setRecentPrompt(input)
-      response = await run(input)
+      setRecentPrompt(prompt); // Set the recent prompt
+      // Check if prompt is not already in previous prompts
+      setPrevPrompts((prev) => {
+        if (!prev.includes(prompt)) {
+          console.log("Updated previous prompts:", [...prev, prompt]);
+          return [...prev, prompt]; // Only add if it doesn't exist
+        }
+        return prev; // Return the existing array if it exists
+      });
+    } else {
+      // When prompt is not defined, use the input
+      response = await run(input);
+      setRecentPrompt(input); // Set the recent input
+      // Add input to previous prompts only if it's not already there
+      setPrevPrompts((prev) => {
+        if (!prev.includes(input)) {
+          const newPrevPrompts = [...prev, input];
+          console.log("Updated previous prompts:", newPrevPrompts);
+          return newPrevPrompts;
+        }
+        return prev; // Return the existing array if it exists
+      });
     }
+
     // setRecentPrompt(input)
     // setPrevPrompts(prev=>[...prev, input])
     // const response = await run(input);
@@ -43,21 +63,18 @@ const ContextProvider = (props) => {
     for (let i = 0; i < responseArray.length; i++) {
       if (i === 0 || i % 2 !== 1) {
         newResponse += responseArray[i];
-      } else{
-        newResponse += "<br/><b>"+responseArray[i]+"</b>"
+      } else {
+        newResponse += "<br/><b>" + responseArray[i] + "</b>";
       }
-      
     }
-    let newResponse2 = newResponse.split("*").join("</br>")
+    let newResponse2 = newResponse.split("*").join("</br>");
     let newResponseArray = newResponse2.split(" ");
     for (let i = 0; i < newResponseArray.length; i++) {
       const nextWord = newResponseArray[i];
-      delayPara(i, nextWord+ " ")
-      
+      delayPara(i, nextWord + " ");
     }
-    setLoading(false)
-    setInput("")
-    
+    setLoading(false);
+    setInput("");
   };
 
   const contextValue = {
@@ -71,7 +88,7 @@ const ContextProvider = (props) => {
     resultData,
     input,
     setInput,
-    newChat
+    newChat,
   };
 
   return (
